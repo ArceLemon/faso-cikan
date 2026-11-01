@@ -1,0 +1,11 @@
+.env
+certificats/
+__pycache__/
+*.pyc
+tests/navigateur/captures/
+
+# Hors depot : dossier de candidature, video, enregistrement vocal
+depot/1-fiche-equipe.md
+depot/*.mp4
+depot/captures-demo/
+voix.m4a

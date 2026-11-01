@@ -1,0 +1,363 @@
+/* Page de connexion Faso Cikan : une carte blanche sur fond gris-bleu.
+   Aucune ressource externe, la police est servie par Keycloak. */
+
+@font-face { font-family: "Work Sans"; font-weight: 400; src: url("../polices/work-sans-400.woff2") format("woff2"); }
+@font-face { font-family: "Work Sans"; font-weight: 500; src: url("../polices/work-sans-500.woff2") format("woff2"); }
+@font-face { font-family: "Work Sans"; font-weight: 600; src: url("../polices/work-sans-600.woff2") format("woff2"); }
+
+:root {
+  --fond: #edf0f6;
+  --carte: #ffffff;
+  --bleu: #5078e1;
+  --bleu-fonce: #3f66cc;
+  --texte: #1f2430;
+  --texte-doux: #7a8194;
+  --trait: #cfd6e2;
+  --rouge: #e5484d;
+  --police: "Work Sans", "Segoe UI", system-ui, sans-serif;
+}
+
+html.faso,
+html.faso body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--fond);
+  color: var(--texte);
+  font-family: var(--police);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.faso-cadre {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 20px;
+  min-height: 100dvh;
+  padding: 20px;
+}
+
+/* Colonne du formulaire */
+.faso-formulaire {
+  display: flex;
+  flex-direction: column;
+  padding: 32px 40px;
+  border-radius: 28px;
+  background: var(--carte);
+}
+
+.faso-formulaire__contenu {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  padding: 40px 0;
+}
+
+.faso-marque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.faso-point {
+  color: var(--bleu);
+}
+
+.faso-formulaire h1 {
+  margin: 0 0 8px;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.faso-sous-titre {
+  margin: 0 0 32px;
+  color: var(--texte-doux);
+  font-size: 16px;
+}
+
+/* Colonne de présentation */
+.faso-vitrine {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  overflow: hidden;
+  padding: 56px 0 0 56px;
+  border-radius: 28px;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(255, 255, 255, 0.18), transparent 38%),
+    linear-gradient(150deg, #5c84ea 0%, #5078e1 45%, #3c5fc8 100%);
+}
+
+.faso-vitrine h2 {
+  max-width: 15ch;
+  margin: 0 0 24px;
+  font-size: clamp(30px, 3vw, 42px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.faso-vitrine ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0 56px 0 0;
+  list-style: none;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.faso-vitrine li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.faso-coche {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.faso-coche::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  margin-top: -2px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+
+.faso-vitrine__ecran {
+  overflow: hidden;
+  border: 6px solid rgba(255, 255, 255, 0.9);
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 20px 0 0 0;
+  box-shadow: 0 30px 60px -20px rgba(10, 20, 60, 0.45);
+}
+
+.faso-vitrine__ecran img {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .faso-formulaire__contenu,
+  .faso-vitrine__ecran {
+    animation: faso-entree 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .faso-vitrine__ecran {
+    animation-delay: 120ms;
+  }
+}
+
+@keyframes faso-entree {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+.faso form,
+.faso .pf-v5-c-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.faso .pf-v5-c-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.faso .pf-v5-c-form__label-text,
+.faso label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--texte);
+}
+
+/* Champs : on neutralise le style PatternFly et on garde un seul cadre arrondi */
+.faso .pf-v5-c-form-control {
+  --pf-v5-c-form-control--before--BorderColor: transparent;
+  --pf-v5-c-form-control--after--BorderColor: transparent;
+  --pf-v5-c-form-control--focus--after--BorderBottomColor: transparent;
+  --pf-v5-c-form-control--hover--after--BorderBottomColor: transparent;
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+  background: var(--carte);
+}
+
+.faso .pf-v5-c-form-control:focus-within {
+  border-color: var(--bleu);
+  box-shadow: 0 0 0 3px rgba(80, 120, 225, 0.18);
+}
+
+.faso .pf-v5-c-form-control.pf-m-error {
+  border-color: var(--rouge);
+}
+
+.faso .pf-v5-c-form-control > input {
+  height: 48px;
+  padding: 0 14px;
+  font-family: var(--police);
+  font-size: 15px;
+}
+
+.faso .pf-v5-c-input-group {
+  gap: 0;
+}
+
+.faso .pf-v5-c-input-group .pf-v5-c-form-control {
+  border-radius: 12px 0 0 12px;
+}
+
+.faso .pf-v5-c-button.pf-m-control {
+  border: 1px solid var(--trait);
+  border-left: 0;
+  border-radius: 0 12px 12px 0;
+  background: var(--carte);
+  color: var(--texte-doux);
+}
+
+.faso .pf-v5-c-button.pf-m-control::after {
+  display: none;
+}
+
+.faso #username,
+.faso #kc-attempted-username {
+  letter-spacing: 0.04em;
+}
+
+.faso #otp {
+  font-size: 22px;
+  letter-spacing: 0.35em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.faso .pf-v5-c-button.pf-m-primary,
+.faso input[type="submit"] {
+  width: 100%;
+  height: 50px;
+  margin-top: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--bleu);
+  color: #ffffff;
+  font-family: var(--police);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.faso .pf-v5-c-button.pf-m-primary:hover,
+.faso input[type="submit"]:hover {
+  background: var(--bleu-fonce);
+}
+
+.faso .pf-v5-c-button.pf-m-primary:focus-visible {
+  outline: 3px solid rgba(80, 120, 225, 0.35);
+  outline-offset: 2px;
+}
+
+.faso .pf-v5-c-helper-text__item-text.pf-m-error {
+  color: var(--rouge);
+  font-size: 13px;
+}
+
+.faso .pf-v5-c-form-control__utilities {
+  display: none;
+}
+
+.faso-alerte {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fdecec;
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.faso-alerte--success { background: #e8f5ee; color: #17663a; }
+.faso-alerte--warning,
+.faso-alerte--info { background: #eef3fd; color: #2f4fa8; }
+
+.faso-lien {
+  margin-top: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bleu);
+  font: inherit;
+  cursor: pointer;
+}
+
+.faso-info {
+  margin-top: 20px;
+  color: var(--texte-doux);
+  font-size: 14px;
+}
+
+.faso-pied {
+  margin: 0;
+  color: var(--texte-doux);
+  font-size: 13px;
+}
+
+/* Activation du code à usage unique */
+.faso #kc-totp-secret-qr-code {
+  display: block;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid var(--trait);
+  border-radius: 12px;
+}
+
+.faso #kc-totp-settings {
+  padding-left: 18px;
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) {
+  .faso-cadre {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .faso-vitrine {
+    display: none;
+  }
+
+  .faso-formulaire {
+    min-height: calc(100dvh - 24px);
+    padding: 24px 20px;
+  }
+}
+
+/* Le cadre arrondi suffit : pas de contour navigateur ni de trait PatternFly */
+.faso .pf-v5-c-form-control > input:focus {
+  outline: none;
+}
+
+.faso .pf-v5-c-form-control::before,
+.faso .pf-v5-c-form-control::after {
+  display: none !important;
+}

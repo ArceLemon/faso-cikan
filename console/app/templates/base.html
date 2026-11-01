@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block titre %}Console{% endblock %} | Faso Cikan</title>
+  <link rel="icon" href="/statique/embleme.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/statique/console.css">
+</head>
+<body>
+  <header class="barre">
+    <a class="barre__marque" href="/">
+      <img src="/statique/embleme.svg" alt="" width="34" height="34">
+      <span>
+        <strong>Faso Cikan</strong>
+        <small>Console de l'autorité administrative</small>
+      </span>
+    </a>
+    {% if utilisateur %}
+    <div class="barre__compte">
+      <span class="barre__identite">
+        {{ utilisateur.nom }}
+        <small>{{ utilisateur.matricule }}</small>
+      </span>
+      <form method="post" action="/deconnexion">
+        <button class="bouton bouton--discret" type="submit">Déconnexion</button>
+      </form>
+    </div>
+    {% endif %}
+  </header>
+  {% block contenu %}{% endblock %}
+</body>
+</html>

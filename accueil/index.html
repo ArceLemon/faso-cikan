@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faso Cikan | Messagerie sécurisée de l'administration</title>
+  <meta name="description" content="La messagerie chiffrée des agents de l'État burkinabè, hébergée par l'administration.">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="embleme.svg" type="image/svg+xml">
+  <link rel="preload" href="polices/work-sans-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="apercu.png" as="image">
+  <link rel="stylesheet" href="accueil.css">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav__cadre">
+    <a class="marque" href="/" aria-label="Faso Cikan, accueil">
+      <img src="embleme.svg" alt="" width="34" height="34">
+      <span>Faso Cikan<span class="marque__point">.</span></span>
+    </a>
+    <nav class="nav__liens" aria-label="Sections">
+      <a href="#fonctions">Fonctions</a>
+      <a href="#securite">Sécurité</a>
+      <a href="#logiciels">Logiciels libres</a>
+    </nav>
+    <a class="bouton bouton--principal" href="/app/">Se connecter</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- Hero : promesse à gauche, vraie capture du produit à droite -->
+  <section class="hero">
+    <div class="hero__texte">
+      <h1 class="apparition">La messagerie sécurisée des agents de l'État.</h1>
+      <p class="hero__sous-titre apparition">
+        Échangez entre services et ministères. Vos messages sont chiffrés sur votre appareil
+        et restent sur les serveurs de l'administration.
+      </p>
+      <div class="hero__actions apparition">
+        <a class="bouton bouton--principal bouton--grand" href="/app/">
+          Se connecter
+          <span class="icone icone--fleche" aria-hidden="true"></span>
+        </a>
+        <a class="bouton bouton--clair bouton--grand" href="#fonctions">Découvrir</a>
+      </div>
+    </div>
+
+    <div class="hero__visuel apparition">
+      <div class="ecran">
+        <img src="apercu.png" width="1440" height="900"
+             alt="Faso Cikan : liste des conversations et échange entre deux agents, avec un message confidentiel">
+      </div>
+
+      <div class="flottant flottant--confidentiel" aria-hidden="true">
+        <div class="bulle-classee">
+          <div class="bulle-classee__bandeau">
+            <span>Confidentiel</span>
+            <span class="compte-a-rebours" data-depart="299">S'efface dans 4 min 59 s</span>
+          </div>
+          <p>Le projet de décret part au Conseil des ministres jeudi.</p>
+        </div>
+      </div>
+
+      <div class="flottant flottant--chiffre" aria-hidden="true">
+        <span class="pastille-icone"><span class="icone icone--cadenas"></span></span>
+        <span>
+          <strong>Chiffré de bout en bout</strong>
+          <small>Lisible uniquement par les destinataires</small>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fonctions : grille de quatre tuiles de tailles différentes -->
+  <section class="fonctions" id="fonctions">
+    <h2 class="titre-section revele">Pensée pour le travail de l'administration</h2>
+
+    <div class="grille-fonctions">
+      <article class="tuile tuile--classification revele">
+        <div class="tuile__texte">
+          <h3>Classifiez chaque message</h3>
+          <p>
+            Diffusion restreinte ou Confidentiel. Un message classifié ne se transfère pas,
+            ne se modifie pas et s'efface sur tous les appareils à l'échéance choisie.
+          </p>
+        </div>
+        <div class="demo-classification" aria-hidden="true">
+          <div class="selecteur">
+            <span class="selecteur__titre">Classification</span>
+            <span class="selecteur__options">
+              <span>Normal</span><span>Restreint</span><span class="actif">Confidentiel</span>
+            </span>
+            <span class="selecteur__delai">après 1 heure</span>
+          </div>
+          <div class="bulle-classee bulle-classee--sur-bleu">
+            <div class="bulle-classee__bandeau">
+              <span>Confidentiel</span>
+              <span>S'efface dans 59 min</span>
+            </div>
+            <p>Liste des candidats retenus pour la promotion 2026, en pièce jointe.</p>
+          </div>
+          <div class="efface">
+            <span class="icone icone--minuteur"></span>
+            Ce message a expiré. Son contenu a été effacé.
+          </div>
+        </div>
+      </article>
+
+      <article class="tuile tuile--matricule revele">
+        <span class="pastille-icone pastille-icone--bleu"><span class="icone icone--carte"></span></span>
+        <h3>Votre matricule comme identifiant</h3>
+        <p>Pas de numéro de téléphone. Mot de passe et code à usage unique à chaque connexion.</p>
+        <div class="code" aria-hidden="true">
+          <span>4</span><span>8</span><span>2</span><span>9</span><span>1</span><span>6</span>
+        </div>
+      </article>
+
+      <article class="tuile tuile--revocation revele">
+        <span class="pastille-icone pastille-icone--rouge"><span class="icone icone--retrait"></span></span>
+        <h3>Révocation immédiate</h3>
+        <p>Un agent muté ou radié perd l'accès sur tous ses appareils, en une seule opération.</p>
+        <div class="avis-revocation" aria-hidden="true">
+          <strong>Accès révoqué</strong>
+          <span>2 appareils déconnectés, 6 conversations quittées</span>
+        </div>
+      </article>
+
+      <article class="tuile tuile--souverain revele">
+        <span class="pastille-icone pastille-icone--vert"><span class="icone icone--batiment"></span></span>
+        <div>
+          <h3>Hébergé par l'État, sans service tiers</h3>
+          <p>Serveur, base de données et identités restent dans l'infrastructure de l'administration.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Sécurité : ce que le serveur voit, ce qu'il ne voit jamais -->
+  <section class="securite" id="securite">
+    <div class="securite__cadre revele">
+      <div class="securite__intro">
+        <h2>Le serveur achemine vos messages. Il ne peut pas les lire.</h2>
+        <p>
+          Le chiffrement et le déchiffrement se font uniquement sur les appareils des agents.
+          Nous documentons aussi ce que le serveur voit, pour que chacun sache à quoi s'en tenir.
+        </p>
+      </div>
+      <div class="securite__colonnes">
+        <div class="colonne colonne--non">
+          <h3><span class="icone icone--cadenas"></span> Ne voit jamais</h3>
+          <ul>
+            <li>Le texte des messages</li>
+            <li>Le contenu des pièces jointes</li>
+            <li>Les réactions et réponses chiffrées</li>
+          </ul>
+        </div>
+        <div class="colonne colonne--oui">
+          <h3><span class="icone icone--serveur"></span> Voit pour acheminer</h3>
+          <ul>
+            <li>L'expéditeur et la conversation</li>
+            <li>L'heure d'envoi</li>
+            <li>Le niveau de classification et son échéance</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logiciels libres -->
+  <section class="logiciels" id="logiciels">
+    <h2 class="titre-section revele">Construit sur des logiciels libres éprouvés</h2>
+    <ul class="logos revele">
+      <li><img src="logos/matrix.svg" alt="Matrix" width="40" height="40"></li>
+      <li><img src="logos/element.svg" alt="Element" width="40" height="40"></li>
+      <li><img src="logos/keycloak.svg" alt="Keycloak" width="40" height="40"></li>
+      <li><img src="logos/postgresql.svg" alt="PostgreSQL" width="40" height="40"></li>
+      <li><img src="logos/docker.svg" alt="Docker" width="40" height="40"></li>
+      <li><img src="logos/caddy.svg" alt="Caddy" width="40" height="40"></li>
+    </ul>
+  </section>
+
+  <!-- Appel final -->
+  <section class="final">
+    <div class="final__carte revele">
+      <h2>Votre matricule suffit pour commencer.</h2>
+      <p>Les comptes sont créés par le service des ressources humaines de votre ministère.</p>
+      <a class="bouton bouton--blanc bouton--grand" href="/app/">
+        Se connecter
+        <span class="icone icone--fleche" aria-hidden="true"></span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pied">
+  <div class="pied__cadre">
+    <span class="marque marque--petite">
+      <img src="embleme.svg" alt="" width="24" height="24">
+      <span>Faso Cikan<span class="marque__point">.</span></span>
+    </span>
+    <span>Messagerie de l'administration publique du Burkina Faso</span>
+    <span>Code source sous licence AGPL-3.0</span>
+  </div>
+</footer>
+
+<script>
+  // Apparition des sections au défilement, et compte à rebours de la carte « Confidentiel ».
+  (function () {
+    var reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var cibles = document.querySelectorAll(".revele");
+    if (reduit || !("IntersectionObserver" in window)) {
+      cibles.forEach(function (el) { el.classList.add("visible"); });
+    } else {
+      var obs = new IntersectionObserver(function (entrees) {
+        entrees.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.18 });
+      cibles.forEach(function (el) { obs.observe(el); });
+    }
+
+    var minuteur = document.querySelector(".compte-a-rebours");
+    if (minuteur && !reduit) {
+      var reste = parseInt(minuteur.dataset.depart, 10);
+      setInterval(function () {
+        reste = reste > 0 ? reste - 1 : 299;
+        var m = Math.floor(reste / 60), s = reste % 60;
+        minuteur.textContent = "S'efface dans " + m + " min " + (s < 10 ? "0" : "") + s + " s";
+      }, 1000);
+    }
+  })();
+</script>
+</body>
+</html>

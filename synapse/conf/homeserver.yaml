@@ -1,0 +1,136 @@
+# Configuration Synapse de Faso Cikan.
+# Les variables entre accolades sont remplacées au démarrage par demarrer.sh à partir du fichier .env.
+
+server_name: "${FASO_SERVER_NAME}"
+public_baseurl: "https://matrix.${FASO_DOMAINE}/"
+web_client_location: "https://${FASO_DOMAINE}/app/"
+pid_file: /data/homeserver.pid
+report_stats: false
+
+listeners:
+  - port: 8008
+    type: http
+    tls: false
+    bind_addresses: ["0.0.0.0"]
+    x_forwarded: true
+    resources:
+      # Pas de ressource "federation" : ce serveur ne parle à aucun autre.
+      - names: [client]
+        compress: false
+
+database:
+  name: psycopg2
+  args:
+    user: synapse
+    password: "${POSTGRES_PASSWORD}"
+    database: synapse
+    host: postgres
+    cp_min: 5
+    cp_max: 10
+
+log_config: /data/log.config
+media_store_path: /data/media_store
+signing_key_path: /data/signing.key
+
+macaroon_secret_key: "${SYNAPSE_MACAROON_SECRET}"
+form_secret: "${SYNAPSE_FORM_SECRET}"
+# Sert uniquement à créer le compte technique de la console d'administration.
+registration_shared_secret: "${SYNAPSE_REGISTRATION_SHARED_SECRET}"
+
+# ---------------------------------------------------------------------------
+# Fédération désactivée
+# ---------------------------------------------------------------------------
+federation_domain_whitelist: []
+trusted_key_servers: []
+suppress_key_server_warning: true
+allow_public_rooms_over_federation: false
+allow_public_rooms_without_auth: false
+
+# ---------------------------------------------------------------------------
+# Comptes : aucun compte local, tout passe par Keycloak
+# ---------------------------------------------------------------------------
+enable_registration: false
+password_config:
+  enabled: false
+enable_3pid_changes: false
+# Le nom affiché vient de l'annuaire de l'État, l'agent ne le modifie pas.
+enable_set_displayname: false
+
+oidc_providers:
+  - idp_id: keycloak
+    idp_name: "Matricule de la fonction publique"
+    discover: true
+    issuer: "https://auth.${FASO_DOMAINE}/realms/fonction-publique"
+    client_id: synapse
+    client_secret: "${SYNAPSE_OIDC_SECRET}"
+    client_auth_method: client_secret_post
+    scopes: ["openid", "profile"]
+    # Une session fermée dans Keycloak ferme aussi la session Matrix.
+    backchannel_logout_enabled: true
+    # Seuls les comptes portant le rôle "agent" entrent.
+    attribute_requirements:
+      - attribute: faso_roles
+        value: agent
+    user_mapping_provider:
+      config:
+        subject_claim: sub
+        # L'identifiant Matrix découle du matricule : @247851k:faso.gov.bf
+        localpart_template: "{{ user.preferred_username }}"
+        display_name_template: "{{ user.given_name }} {{ user.family_name }}"
+
+# Un ministère entier peut sortir par la même adresse IP : la limite par adresse
+# est relevée, la limite par compte reste stricte. La protection contre la force
+# brute sur les mots de passe est assurée par Keycloak.
+rc_login:
+  address:
+    per_second: 2
+    burst_count: 30
+  account:
+    per_second: 0.5
+    burst_count: 10
+
+sso:
+  client_whitelist:
+    - "https://${FASO_DOMAINE}/"
+  update_profile_information: true
+
+# ---------------------------------------------------------------------------
+# Chiffrement et métadonnées
+# ---------------------------------------------------------------------------
+encryption_enabled_by_default_for_room_type: all
+
+presence:
+  enabled: false
+
+# Durée de conservation des adresses IP de connexion.
+user_ips_max_age: 1d
+# Un message supprimé est purgé de la base au bout d'une minute.
+redaction_retention_period: 1m
+forget_rooms_on_leave: true
+
+url_preview_enabled: false
+max_upload_size: 50M
+media_retention:
+  local_media_lifetime: 365d
+  remote_media_lifetime: 1d
+
+user_directory:
+  enabled: true
+  search_all_users: true
+  prefer_local_users: true
+require_auth_for_profile_requests: true
+
+enable_metrics: false
+
+# ---------------------------------------------------------------------------
+# Règles de classification appliquées côté serveur
+# ---------------------------------------------------------------------------
+modules:
+  - module: faso_cikan.ModuleFasoCikan
+    config:
+      base: /data/faso_expirations.sqlite3
+      intervalle_secondes: 5
+      duree_min_secondes: 30
+      duree_max_secondes: 604800
+      comptes_techniques:
+        - "@systeme.console:${FASO_SERVER_NAME}"

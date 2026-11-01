@@ -1,0 +1,179 @@
+/*
+Copyright 2026 Équipe Faso Cikan
+
+SPDX-License-Identifier: AGPL-3.0-only
+*/
+
+/* Couleurs des niveaux, lisibles en thème clair comme en thème sombre */
+:root {
+    --faso-restreint: #9a6700;
+    --faso-restreint-fond: rgba(214, 160, 0, 0.12);
+    --faso-restreint-filet: rgba(214, 160, 0, 0.55);
+    --faso-confidentiel: #b42318;
+    --faso-confidentiel-fond: rgba(200, 16, 46, 0.08);
+    --faso-confidentiel-filet: rgba(200, 16, 46, 0.5);
+}
+
+.cpd-theme-dark {
+    --faso-restreint: #f2c94c;
+    --faso-confidentiel: #ff8a80;
+}
+
+/* ------------------------------------------------------------------ */
+/* Sélecteur au-dessus de la zone de saisie                            */
+/* ------------------------------------------------------------------ */
+
+.faso_Selecteur {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cpd-space-2x) var(--cpd-space-3x);
+    padding: var(--cpd-space-1x) 0 var(--cpd-space-2x);
+    font: var(--cpd-font-body-sm-regular);
+    color: var(--cpd-color-text-secondary);
+}
+
+.faso_Selecteur_titre {
+    font: var(--cpd-font-body-xs-regular);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.faso_Selecteur_niveaux {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid var(--cpd-color-border-interactive-secondary);
+    border-radius: 8px;
+    background: var(--cpd-color-bg-canvas-default);
+}
+
+.faso_Selecteur_niveau {
+    padding: 3px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: var(--cpd-color-text-secondary);
+    font: var(--cpd-font-body-sm-medium);
+    cursor: pointer;
+
+    &:hover {
+        color: var(--cpd-color-text-primary);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--cpd-color-border-focused);
+        outline-offset: 1px;
+    }
+
+    &[aria-checked="true"] {
+        background: var(--cpd-color-bg-subtle-secondary);
+        color: var(--cpd-color-text-primary);
+    }
+
+    &.faso_Selecteur_niveau--restreint[aria-checked="true"] {
+        background: var(--faso-restreint-fond);
+        color: var(--faso-restreint);
+    }
+
+    &.faso_Selecteur_niveau--confidentiel[aria-checked="true"] {
+        background: var(--faso-confidentiel-fond);
+        color: var(--faso-confidentiel);
+    }
+}
+
+.faso_Selecteur_delai {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cpd-space-1-5x);
+
+    select {
+        padding: 3px 6px;
+        border: 1px solid var(--cpd-color-border-interactive-secondary);
+        border-radius: 6px;
+        background: var(--cpd-color-bg-canvas-default);
+        color: var(--cpd-color-text-primary);
+        font: var(--cpd-font-body-sm-regular);
+    }
+}
+
+.faso_Selecteur_regle {
+    margin-left: auto;
+    font: var(--cpd-font-body-xs-regular);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.faso_Selecteur--restreint .faso_Selecteur_regle {
+    color: var(--faso-restreint);
+}
+
+.faso_Selecteur--confidentiel .faso_Selecteur_regle {
+    color: var(--faso-confidentiel);
+}
+
+/* La zone de saisie prend la couleur du niveau choisi */
+.mx_MessageComposer_wrapper:has(.faso_Selecteur--restreint) .mx_MessageComposer_row {
+    box-shadow: inset 3px 0 0 var(--faso-restreint-filet);
+    padding-left: var(--cpd-space-2x);
+}
+
+.mx_MessageComposer_wrapper:has(.faso_Selecteur--confidentiel) .mx_MessageComposer_row {
+    box-shadow: inset 3px 0 0 var(--faso-confidentiel-filet);
+    padding-left: var(--cpd-space-2x);
+}
+
+/* ------------------------------------------------------------------ */
+/* Message classifié dans la conversation                              */
+/* ------------------------------------------------------------------ */
+
+.faso_Cadre {
+    margin: 2px 0;
+    padding: var(--cpd-space-1-5x) var(--cpd-space-3x) var(--cpd-space-2x);
+    border-left: 3px solid var(--faso-restreint-filet);
+    border-radius: 0 8px 8px 0;
+    background: var(--faso-restreint-fond);
+}
+
+.faso_Cadre--confidentiel {
+    border-left-color: var(--faso-confidentiel-filet);
+    background: var(--faso-confidentiel-fond);
+}
+
+.faso_Cadre_bandeau {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--cpd-space-1x) var(--cpd-space-4x);
+    margin-bottom: var(--cpd-space-1x);
+    font: var(--cpd-font-body-xs-regular);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.faso_Cadre_niveau {
+    color: var(--faso-restreint);
+}
+
+.faso_Cadre--confidentiel .faso_Cadre_niveau {
+    color: var(--faso-confidentiel);
+}
+
+.faso_Cadre_regle {
+    color: var(--cpd-color-text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.faso_Cadre_expire {
+    margin: 0;
+    color: var(--cpd-color-text-secondary);
+    font: var(--cpd-font-body-md-regular);
+    font-style: italic;
+}
+
+/* Le texte d'un message classifié n'est pas sélectionnable par simple glisser */
+.faso_Cadre--confidentiel .faso_Cadre_corps {
+    user-select: none;
+}

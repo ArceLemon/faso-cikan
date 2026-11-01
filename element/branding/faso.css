@@ -1,0 +1,362 @@
+/* Habillage Faso Cikan : grandes cartes blanches sur fond gris-bleu,
+   bleu franc pour l'action, bulles de discussion. */
+
+:root {
+  --f-fond: #edf0f6;
+  --f-carte: #ffffff;
+  --f-bleu: #5078e1;
+  --f-bleu-fonce: #3f66cc;
+  --f-bleu-pale: #dee9f5;
+  --f-selection: #e6edf4;
+  --f-gris-bouton: #ecf1f6;
+  --f-trait: #e4e8f0;
+  --f-texte: #1f2430;
+  --f-texte-doux: #7a8194;
+  --f-rouge: #e5484d;
+  --f-rayon: 22px;
+  --f-espace: 20px;
+}
+
+body {
+  background: var(--f-fond) !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cadre général : barre en haut, cartes en dessous                     */
+/* ------------------------------------------------------------------ */
+
+.mx_MatrixChat_wrapper {
+  flex-direction: column;
+  gap: var(--f-espace);
+  padding: var(--f-espace);
+  box-sizing: border-box;
+  background: var(--f-fond);
+}
+
+.mx_MatrixChat {
+  gap: 0;
+  background: transparent;
+}
+
+.mx_MatrixChat > * {
+  background: transparent !important;
+}
+
+/* Barre supérieure */
+.faso_Barre {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 24px;
+  height: 76px;
+  padding: 0 14px 0 26px;
+  border-radius: var(--f-rayon);
+  background: var(--f-carte);
+  font-family: var(--font-family);
+}
+
+.faso_Barre_marque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 236px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--f-texte);
+}
+
+.faso_Barre_point {
+  color: var(--f-bleu);
+}
+
+.faso_Barre_recherche {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(540px, 40vw);
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid #cfd6e2;
+  border-radius: 12px;
+  background: var(--f-carte);
+  color: var(--f-texte-doux);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: text;
+}
+
+.faso_Barre_recherche svg {
+  color: var(--f-texte);
+}
+
+.faso_Barre_recherche:hover {
+  border-color: #b9c2d3;
+}
+
+.faso_Barre_actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.faso_Barre_rond {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--f-gris-bouton);
+  color: var(--f-texte);
+  cursor: pointer;
+}
+
+.faso_Barre_rond:hover {
+  background: #dfe6ef;
+}
+
+.faso_Barre_agent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 18px;
+  padding: 8px 18px 8px 8px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--f-gris-bouton);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faso_Barre_avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--f-bleu);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.faso_Barre_identite {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.faso_Barre_identite strong {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--f-texte);
+}
+
+.faso_Barre_identite small {
+  font-size: 13px;
+  color: var(--f-texte-doux);
+}
+
+.faso_Barre :focus-visible {
+  outline: 2px solid var(--f-bleu);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Navigation de gauche                                                 */
+/* ------------------------------------------------------------------ */
+
+.mx_SpacePanel {
+  margin-right: var(--f-espace);
+  padding: 16px 12px !important;
+  border-radius: var(--f-rayon);
+  background: var(--f-carte) !important;
+}
+
+.mx_SpacePanel .mx_SpaceButton {
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+}
+
+.mx_SpacePanel .mx_SpaceItem.mx_SpaceItem_selected > .mx_SpaceButton,
+.mx_SpacePanel .mx_SpaceButton_active {
+  background: var(--f-bleu) !important;
+  color: #fff !important;
+}
+
+
+.mx_SpacePanel .mx_SpaceButton_name {
+  font-size: 16px;
+  color: var(--f-texte);
+}
+
+/* ------------------------------------------------------------------ */
+/* Liste des conversations                                              */
+/* ------------------------------------------------------------------ */
+
+.mx_LeftPanel_outerWrapper,
+.mx_LeftPanel,
+.mx_RoomListPanel {
+  background: var(--f-carte) !important;
+}
+
+.mx_LeftPanel_outerWrapper {
+  overflow: hidden;
+  border-radius: var(--f-rayon);
+}
+
+.mx_RoomListItemView {
+  border-radius: 0 !important;
+}
+
+.mx_RoomListItemView_selected,
+.mx_RoomListItemView[aria-selected="true"] {
+  background: var(--f-selection) !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Zone de discussion                                                   */
+/* ------------------------------------------------------------------ */
+
+.mx_RoomView_wrapper {
+  overflow: hidden;
+  border-radius: var(--f-rayon);
+  background: var(--f-carte);
+}
+
+.mx_RoomView,
+.mx_RoomView_body,
+.mx_RoomView_messagePanel,
+.mx_RoomView_timeline {
+  background: var(--f-bleu-pale);
+}
+
+.mx_RoomHeader {
+  background: var(--f-carte) !important;
+}
+
+/* Bulles : reçues en blanc, envoyées en bleu */
+.mx_EventTile {
+  --event-tile-bubble-other-background: #ffffff !important;
+  --event-tile-bubble-self-background: var(--f-bleu) !important;
+  --cornerRadius: 18px !important;
+}
+
+.mx_EventTile[data-self="true"][data-layout="bubble"] .mx_EventTile_line,
+.mx_EventTile[data-self="true"][data-layout="bubble"] .mx_EventTile_line a {
+  color: #ffffff;
+}
+
+/* Zone de saisie */
+.mx_MessageComposer {
+  background: var(--f-carte) !important;
+  border-top: 0 !important;
+}
+
+.mx_MessageComposer_row {
+  min-height: 56px;
+  padding: 6px 12px !important;
+  border: 1px solid #cfd6e2;
+  border-radius: 16px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Ajustements                                                          */
+/* ------------------------------------------------------------------ */
+
+/* Le compte de l'agent est déjà dans la barre du haut */
+.mx_SpacePanel .mx_UserMenu,
+.mx_SpacePanel_toggleCollapse {
+  display: none !important;
+}
+
+/* La recherche est déjà dans la barre du haut */
+.mx_RoomListSearch,
+.mx_RoomListSearchView {
+  display: none !important;
+}
+
+/* Le champ de saisie reste dans sa carte */
+.mx_MessageComposer_wrapper {
+  box-sizing: border-box;
+  padding: 0 20px 18px !important;
+}
+
+.mx_MessageComposer_row {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Puces de filtre de la liste façon onglets */
+.mx_RoomListPrimaryFilters button,
+.mx_RoomListPrimaryFilters [role="option"] {
+  border-radius: 999px !important;
+}
+
+/* Recherche et exploration : déjà dans la barre du haut */
+.mx_RoomListPanel > div[role="search"] {
+  display: none !important;
+}
+
+/* Élément actif de la navigation : bleu plein, texte et icône blancs */
+.mx_SpacePanel .mx_SpaceButton.mx_SpaceButton_active {
+  background: var(--f-bleu) !important;
+}
+
+.mx_SpacePanel .mx_SpaceButton .mx_SpaceButton_selectionWrapper {
+  background: transparent !important;
+  padding: 2px 4px !important;
+}
+
+.mx_SpacePanel .mx_SpaceButton_active .mx_SpaceButton_name {
+  color: #ffffff !important;
+}
+
+.mx_SpacePanel .mx_SpaceButton_active .mx_SpaceButton_avatarPlaceholder {
+  background: transparent !important;
+}
+
+.mx_SpacePanel .mx_SpaceButton_active .mx_SpaceButton_icon::before {
+  background-color: #ffffff !important;
+}
+
+/* Ligne sélectionnée : fond bleu pâle, sans liseré */
+.mx_RoomListItemView_selected::before,
+.mx_RoomListItemView_selected::after {
+  background: transparent !important;
+}
+
+.mx_RoomListPanel button.mx_RoomListItemView {
+  border-left: 0 !important;
+}
+
+/* Boutons principaux en bleu */
+:root,
+[class*="cpd-theme-"] {
+  --cpd-color-bg-action-primary-rest: #5078e1 !important;
+  --cpd-color-bg-action-primary-hovered: #3f66cc !important;
+  --cpd-color-bg-action-primary-pressed: #3557b3 !important;
+  --cpd-color-bg-accent-rest: #5078e1 !important;
+  --cpd-color-text-action-accent: #3f66cc !important;
+  --cpd-color-border-focused: #5078e1 !important;
+}
+
+/* Lignes de la liste : nom en gras, aperçu en gris, comme une boîte de réception */
+.mx_RoomListItemView {
+  min-height: 64px;
+}
+
+.mx_RoomListItemView [class*="roomName"],
+.mx_RoomListItemView [class*="RoomName"] {
+  font-weight: 600 !important;
+  color: var(--f-texte) !important;
+}
+
+.mx_RoomListItemView [class*="messagePreview"],
+.mx_RoomListItemView [class*="MessagePreview"] {
+  color: var(--f-texte-doux) !important;
+}

@@ -1,0 +1,212 @@
+diff --git a/apps/web/src/ContentMessages.ts b/apps/web/src/ContentMessages.ts
+index a6987ae..28e9945 100644
+--- a/apps/web/src/ContentMessages.ts
++++ b/apps/web/src/ContentMessages.ts
+@@ -35,6 +35,7 @@ import type { AttachmentSend } from "@matrix-org/analytics-events/types/typescri
+ import type { AttachmentCancel } from "@matrix-org/analytics-events/types/typescript/AttachmentCancel";
+ 
+ import dis from "./dispatcher/dispatcher";
++import { appliquerClassification } from "./faso/classification";
+ import { _t } from "./languageHandler";
+ import Modal from "./Modal";
+ import Spinner from "./components/views/elements/Spinner";
+@@ -677,6 +678,7 @@ export default class ContentMessages {
+             if (upload.cancelled) throw new UploadCanceledError();
+             const threadId = relation?.rel_type === THREAD_RELATION_TYPE.name ? relation.event_id : null;
+ 
++            appliquerClassification(roomId, content);
+             const response = await matrixClient.sendMessage(roomId, threadId ?? null, content as MediaEventContent);
+ 
+             if (SettingsStore.getValue("Performance.addSendMessageTimingMetadata")) {
+diff --git a/apps/web/src/components/structures/LoggedInView.tsx b/apps/web/src/components/structures/LoggedInView.tsx
+index 58666e3..8641514 100644
+--- a/apps/web/src/components/structures/LoggedInView.tsx
++++ b/apps/web/src/components/structures/LoggedInView.tsx
+@@ -65,6 +65,7 @@ import { Landmark, LandmarkNavigation } from "../../accessibility/LandmarkNaviga
+ import { ModuleApi } from "../../modules/Api.ts";
+ import { SDKContext } from "../../contexts/SDKContext.ts";
+ import { ResizerViewModel } from "../../viewmodels/structures/ResizerViewModel.ts";
++import { BarreSuperieure } from "../../faso/BarreSuperieure";
+ 
+ // We need to fetch each pinned message individually (if we don't already have it)
+ // so each pinned message may trigger a request. Limit the number per room for sanity.
+@@ -734,6 +735,7 @@ class LoggedInView extends React.Component<IProps, IState> {
+                     aria-hidden={this.props.hideToSRUsers}
+                 >
+                     <ToastContainer />
++                    <BarreSuperieure />
+                     <div className={bodyClasses}>{content}</div>
+                 </div>
+                 <PipContainer />
+diff --git a/apps/web/src/components/structures/MatrixChat.tsx b/apps/web/src/components/structures/MatrixChat.tsx
+index 354b1d0..b95f401 100644
+--- a/apps/web/src/components/structures/MatrixChat.tsx
++++ b/apps/web/src/components/structures/MatrixChat.tsx
+@@ -142,6 +142,7 @@ import { type IScreen } from "../../vector/routing.ts";
+ import { type URLParams } from "../../vector/url_utils.ts";
+ import { type QrLoginCredentials } from "../views/auth/LoginWithQR.tsx";
+ import { configureFromCompletedOAuthLogin } from "../../Lifecycle";
++import "../../faso/style";
+ 
+ const AUTH_SCREENS = ["register", "mobile_register", "login", "forgot_password", "start_sso", "start_cas", "welcome"];
+ 
+diff --git a/apps/web/src/components/views/messages/MessageEvent.tsx b/apps/web/src/components/views/messages/MessageEvent.tsx
+index 2705a48..4fa4df4 100644
+--- a/apps/web/src/components/views/messages/MessageEvent.tsx
++++ b/apps/web/src/components/views/messages/MessageEvent.tsx
+@@ -45,6 +45,8 @@ import {
+     renderMBody,
+ } from "./MBodyFactory";
+ import { TextualBodyFactory } from "./TextualBodyFactory";
++import { CadreClassification } from "../../../faso/CadreClassification";
++import { estClassifie } from "../../../faso/classification";
+ 
+ // onMessageAllowed is handled internally
+ interface IProps extends Omit<IBodyProps, "onMessageAllowed" | "mediaEventHelper"> {
+@@ -333,11 +335,17 @@ export default class MessageEvent extends React.Component<IProps> implements IMe
+             inhibitInteraction: this.props.inhibitInteraction,
+             id: this.props.id,
+         };
++        let corps: React.ReactNode = null;
+         if (hasCaption) {
+-            return <CaptionBody {...bodyProps} WrappedBodyType={BodyType} />;
++            corps = <CaptionBody {...bodyProps} WrappedBodyType={BodyType} />;
++        } else if (BodyType) {
++            corps = <BodyType {...bodyProps} />;
+         }
+ 
+-        return BodyType ? <BodyType {...bodyProps} /> : null;
++        if (!this.props.mxEvent.isRedacted() && estClassifie(this.props.mxEvent)) {
++            return <CadreClassification mxEvent={this.props.mxEvent}>{corps}</CadreClassification>;
++        }
++        return corps;
+     }
+ }
+ 
+diff --git a/apps/web/src/components/views/rooms/MessageComposer.tsx b/apps/web/src/components/views/rooms/MessageComposer.tsx
+index 44fe239..6c794fb 100644
+--- a/apps/web/src/components/views/rooms/MessageComposer.tsx
++++ b/apps/web/src/components/views/rooms/MessageComposer.tsx
+@@ -64,6 +64,7 @@ import { MessageComposerUrlPreviewViewModel } from "../../../viewmodels/composer
+ import { useScopedRoomContext } from "../../../contexts/ScopedRoomContext";
+ import PlatformPeg from "../../../PlatformPeg";
+ import { ModuleApi } from "../../../modules/Api";
++import { SelecteurClassification } from "../../../faso/SelecteurClassification";
+ 
+ // The prefix used when persisting editor drafts to localstorage.
+ export const WYSIWYG_EDITOR_STATE_STORAGE_PREFIX = "mx_wysiwyg_state_";
+@@ -703,6 +704,7 @@ export class MessageComposer extends React.Component<IProps, IState> {
+                         replyToEvent={this.props.replyToEvent}
+                         permalinkCreator={this.props.permalinkCreator}
+                     />
++                    {canSendMessages && <SelecteurClassification roomId={this.props.room.roomId} />}
+                     <div className="mx_MessageComposer_row">
+                         {leftIcon}
+                         {composer}
+diff --git a/apps/web/src/components/views/rooms/SendMessageComposer.tsx b/apps/web/src/components/views/rooms/SendMessageComposer.tsx
+index 9d67309..580efa5 100644
+--- a/apps/web/src/components/views/rooms/SendMessageComposer.tsx
++++ b/apps/web/src/components/views/rooms/SendMessageComposer.tsx
+@@ -68,6 +68,7 @@ import { attachMentions, attachRelation, attachUrlPreviews } from "../../../util
+ import { type RoomUploadViewModel, useRoomUploadViewModel } from "../../../viewmodels/room/RoomUploadViewModel";
+ import { type MessageComposerUrlPreviewViewModel } from "../../../viewmodels/composer/MessageComposerUrlPreviewViewModel";
+ import { linksIn } from "../../../utils/UrlUtils";
++import { appliquerClassification } from "../../../faso/classification";
+ import { type MessageComposerUrlPreviewSnapshot } from "@element-hq/web-shared-components";
+ 
+ // The prefix used when persisting editor drafts to localstorage.
+@@ -477,6 +478,9 @@ export class SendMessageComposer extends React.Component<ISendMessageComposerPro
+                 return;
+             }
+ 
++            // Faso Cikan : étiquette de classification choisie pour ce salon
++            appliquerClassification(roomId, content);
++
+             if (SettingsStore.getValue("Performance.addSendMessageTimingMetadata")) {
+                 decorateStartSendingTime(content);
+             }
+diff --git a/apps/web/src/components/views/spaces/SpacePanel.tsx b/apps/web/src/components/views/spaces/SpacePanel.tsx
+index 41aba1a..59dbb82 100644
+--- a/apps/web/src/components/views/spaces/SpacePanel.tsx
++++ b/apps/web/src/components/views/spaces/SpacePanel.tsx
+@@ -367,7 +367,7 @@ const SpacePanel: React.FC = () => {
+     const sdkContext = useContext(SDKContext);
+     const client = sdkContext.client!;
+     const [dragging, setDragging] = useState(false);
+-    const [isPanelCollapsed, setPanelCollapsed] = useState(true);
++    const [isPanelCollapsed, setPanelCollapsed] = useState(false);
+     const ref = useRef<HTMLDivElement>(null);
+     useLayoutEffect(() => {
+         if (ref.current) UIStore.instance.trackElementDimensions("SpacePanel", ref.current);
+diff --git a/apps/web/src/events/forward/getForwardableEvent.ts b/apps/web/src/events/forward/getForwardableEvent.ts
+index 4f04f02..b940832 100644
+--- a/apps/web/src/events/forward/getForwardableEvent.ts
++++ b/apps/web/src/events/forward/getForwardableEvent.ts
+@@ -9,12 +9,18 @@ Please see LICENSE files in the repository root for full details.
+ import { M_POLL_END, M_POLL_START, M_BEACON_INFO, type MatrixEvent, type MatrixClient } from "matrix-js-sdk/src/matrix";
+ 
+ import { getShareableLocationEventForBeacon } from "../../utils/beacon/getShareableLocation";
++import { estClassifie } from "../../faso/classification";
+ 
+ /**
+  * Get forwardable event for a given event
+  * If an event is not forwardable return null
+  */
+ export const getForwardableEvent = (event: MatrixEvent, cli: MatrixClient): MatrixEvent | null => {
++    // Faso Cikan : un message classifié ne se transfère pas
++    if (estClassifie(event)) {
++        return null;
++    }
++
+     if (M_POLL_START.matches(event.getType()) || M_POLL_END.matches(event.getType())) {
+         return null;
+     }
+diff --git a/apps/web/src/utils/DialogOpener.ts b/apps/web/src/utils/DialogOpener.ts
+index 1e6a540..a294dd7 100644
+--- a/apps/web/src/utils/DialogOpener.ts
++++ b/apps/web/src/utils/DialogOpener.ts
+@@ -15,6 +15,8 @@ import { type ActionPayload } from "../dispatcher/payloads";
+ import Modal from "../Modal";
+ import RoomSettingsDialog from "../components/views/dialogs/RoomSettingsDialog";
+ import ForwardDialog from "../components/views/dialogs/ForwardDialog";
++import ErrorDialog from "../components/views/dialogs/ErrorDialog";
++import { estClassifie } from "../faso/classification";
+ import { Action } from "../dispatcher/actions";
+ import ReportEventDialog from "../components/views/dialogs/ReportEventDialog";
+ import SpacePreferencesDialog from "../components/views/dialogs/SpacePreferencesDialog";
+@@ -65,6 +67,13 @@ export class DialogOpener {
+                 );
+                 break;
+             case Action.OpenForwardDialog:
++                if (estClassifie(payload.event)) {
++                    Modal.createDialog(ErrorDialog, {
++                        title: "Transfert interdit",
++                        description: "Ce message est classifié : il ne peut pas être transféré.",
++                    });
++                    break;
++                }
+                 Modal.createDialog(ForwardDialog, {
+                     matrixClient: this.matrixClient,
+                     event: payload.event,
+diff --git a/apps/web/src/utils/EventUtils.ts b/apps/web/src/utils/EventUtils.ts
+index dd3a062..ee89d7a 100644
+--- a/apps/web/src/utils/EventUtils.ts
++++ b/apps/web/src/utils/EventUtils.ts
+@@ -31,6 +31,7 @@ import { launchPollEditor } from "../components/views/messages/MPollBody";
+ import { Action } from "../dispatcher/actions";
+ import { type ViewRoomPayload } from "../dispatcher/payloads/ViewRoomPayload";
+ import { ModuleApi } from "../modules/Api";
++import { estClassifie } from "../faso/classification";
+ 
+ /**
+  * Returns whether an event should allow actions like reply, reactions, edit, etc.
+@@ -75,7 +76,8 @@ export function canEditContent(matrixClient: MatrixClient, mxEvent: MatrixEvent)
+         mxEvent.status !== null ||
+         mxEvent.isRedacted() ||
+         mxEvent.isRelation(RelationType.Replace) ||
+-        mxEvent.getSender() !== matrixClient.getUserId()
++        mxEvent.getSender() !== matrixClient.getUserId() ||
++        estClassifie(mxEvent)
+     ) {
+         return false;
+     }

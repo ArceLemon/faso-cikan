@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Faso Cikan">
+  <defs>
+    <clipPath id="bulle">
+      <path d="M14 4h36a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10H26l-12 10v-10a10 10 0 0 1-10-10V14A10 10 0 0 1 14 4z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#bulle)">
+    <rect width="64" height="27" fill="#C8102E"/>
+    <rect y="27" width="64" height="37" fill="#00843D"/>
+  </g>
+  <path fill="#FCD116" d="M32 15.5l3.1 9.4h9.9l-8 5.8 3.1 9.4-8.1-5.8-8.1 5.8 3.1-9.4-8-5.8h9.9z"/>
+</svg>

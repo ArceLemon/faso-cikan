@@ -1,0 +1,202 @@
+# Faso Cikan, messagerie souveraine de l'administration.
+# Tout le service se lance avec : ./faso demarrer  (ou docker compose up -d --build)
+
+name: faso-cikan
+
+x-journaux: &journaux
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  postgres:
+    <<: *journaux
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: synapse
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?lancer ./faso init}
+      POSTGRES_DB: synapse
+      # Synapse exige une collation C
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --lc-collate=C --lc-ctype=C
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "synapse"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [interne]
+
+  keycloak:
+    <<: *journaux
+    image: quay.io/keycloak/keycloak:26.7.5
+    restart: unless-stopped
+    command: ["start", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_HOSTNAME: https://auth.${FASO_DOMAINE}
+      # Synapse et la console parlent à Keycloak par le réseau interne
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      # Valeurs injectées dans le realm importé
+      FASO_DOMAINE: ${FASO_DOMAINE}
+      SYNAPSE_OIDC_SECRET: ${SYNAPSE_OIDC_SECRET}
+      CONSOLE_OIDC_SECRET: ${CONSOLE_OIDC_SECRET}
+    volumes:
+      - ./keycloak/realm:/opt/keycloak/data/import:ro
+      - ./keycloak/themes/faso:/opt/keycloak/themes/faso:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          grep -q '"UP"' <&3
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    networks: [interne]
+
+  synapse:
+    <<: *journaux
+    image: matrixdotorg/synapse:v1.163.2
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/conf/demarrer.sh"]
+    environment:
+      SYNAPSE_CONFIG_PATH: /data/homeserver.yaml
+      PYTHONPATH: /modules
+      FASO_DOMAINE: ${FASO_DOMAINE}
+      FASO_SERVER_NAME: ${FASO_SERVER_NAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SYNAPSE_OIDC_SECRET: ${SYNAPSE_OIDC_SECRET}
+      SYNAPSE_REGISTRATION_SHARED_SECRET: ${SYNAPSE_REGISTRATION_SHARED_SECRET}
+      SYNAPSE_MACAROON_SECRET: ${SYNAPSE_MACAROON_SECRET}
+      SYNAPSE_FORM_SECRET: ${SYNAPSE_FORM_SECRET}
+    volumes:
+      - synapse:/data
+      - ./synapse/conf:/conf:ro
+      - ./synapse/modules:/modules:ro
+      - caddy_data:/caddy:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      caddy:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8008/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    networks: [interne]
+
+  element:
+    <<: *journaux
+    build:
+      context: ./element
+      args:
+        ELEMENT_VERSION: v1.12.32
+    image: faso-cikan/element-web:1.12.32-faso
+    restart: unless-stopped
+    volumes:
+      - ./element/config/config.json:/app/config.json:ro
+      - ./element/branding:/app/faso:ro
+    networks: [interne]
+
+  console:
+    <<: *journaux
+    build: ./console
+    image: faso-cikan/console:latest
+    restart: unless-stopped
+    environment:
+      FASO_DOMAINE: ${FASO_DOMAINE}
+      FASO_SERVER_NAME: ${FASO_SERVER_NAME}
+      CONSOLE_OIDC_SECRET: ${CONSOLE_OIDC_SECRET}
+      CONSOLE_SESSION_SECRET: ${CONSOLE_SESSION_SECRET}
+      CONSOLE_API_JETON: ${CONSOLE_API_JETON}
+      SYNAPSE_REGISTRATION_SHARED_SECRET: ${SYNAPSE_REGISTRATION_SHARED_SECRET}
+    volumes:
+      - console:/data
+    depends_on:
+      synapse:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks: [interne]
+
+  caddy:
+    <<: *journaux
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      FASO_DOMAINE: ${FASO_DOMAINE}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./accueil:/srv/accueil:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      interne:
+        # Les tests joignent le service par ses vrais noms publics
+        aliases:
+          - ${FASO_DOMAINE}
+          - matrix.${FASO_DOMAINE}
+          - auth.${FASO_DOMAINE}
+          - console.${FASO_DOMAINE}
+
+  tests:
+    build: ./tests
+    image: faso-cikan/tests:latest
+    profiles: [tests]
+    environment:
+      FASO_DOMAINE: ${FASO_DOMAINE}
+      FASO_SERVER_NAME: ${FASO_SERVER_NAME}
+      CONSOLE_API_JETON: ${CONSOLE_API_JETON}
+    volumes:
+      - caddy_data:/caddy:ro
+      - ./tests:/tests:ro
+      - ./demo:/demo:ro
+    networks: [interne]
+
+  navigateur:
+    build: ./tests/navigateur
+    image: faso-cikan/tests-navigateur:latest
+    profiles: [tests]
+    environment:
+      FASO_DOMAINE: ${FASO_DOMAINE}
+      FASO_SERVER_NAME: ${FASO_SERVER_NAME}
+    volumes:
+      - caddy_data:/caddy:ro
+      - ./tests:/tests:ro
+      - ./demo:/demo:ro
+      - ./tests/navigateur/captures:/captures
+    networks: [interne]
+
+volumes:
+  postgres:
+  synapse:
+  console:
+  caddy_data:
+  caddy_config:
+
+networks:
+  interne:

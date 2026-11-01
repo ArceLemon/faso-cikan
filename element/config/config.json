@@ -1,0 +1,160 @@
+{
+    "default_server_config": {
+        "m.homeserver": {
+            "base_url": "https://matrix.faso.localhost",
+            "server_name": "faso.gov.bf"
+        }
+    },
+    "brand": "Faso Cikan",
+    "disable_custom_urls": true,
+    "disable_guests": true,
+    "disable_login_language_selector": true,
+    "disable_3pid_login": true,
+    "default_country_code": "BF",
+    "default_theme": "custom-Faso Cikan",
+    "show_labs_settings": false,
+    "room_directory": {
+        "servers": [
+            "faso.gov.bf"
+        ]
+    },
+    "branding": {
+        "welcome_background_url": "faso/fond.svg",
+        "auth_header_logo_url": "faso/embleme.svg",
+        "auth_footer_links": [
+            {
+                "text": "Accueil Faso Cikan",
+                "url": "https://faso.localhost/"
+            }
+        ]
+    },
+    "setting_defaults": {
+        "language": "fr",
+        "UIFeature.registration": false,
+        "UIFeature.passwordReset": false,
+        "UIFeature.deactivate": false,
+        "UIFeature.identityServer": false,
+        "UIFeature.thirdPartyId": false,
+        "UIFeature.feedback": false,
+        "UIFeature.shareSocial": false,
+        "UIFeature.shareQrCode": false,
+        "UIFeature.urlPreviews": false,
+        "UIFeature.widgets": false,
+        "UIFeature.voip": false,
+        "UIFeature.locationSharing": false,
+        "UIFeature.allowCreatingPublicRooms": false,
+        "UIFeature.allowCreatingPublicSpaces": false,
+        "custom_themes": [
+            {
+                "name": "Faso Cikan",
+                "is_dark": false,
+                "fonts": {
+                    "faces": [
+                        {
+                            "font-family": "Work Sans",
+                            "font-weight": 400,
+                            "font-style": "normal",
+                            "src": [
+                                {
+                                    "url": "faso/polices/work-sans-400.woff2",
+                                    "format": "woff2"
+                                }
+                            ]
+                        },
+                        {
+                            "font-family": "Work Sans",
+                            "font-weight": 500,
+                            "font-style": "normal",
+                            "src": [
+                                {
+                                    "url": "faso/polices/work-sans-500.woff2",
+                                    "format": "woff2"
+                                }
+                            ]
+                        },
+                        {
+                            "font-family": "Work Sans",
+                            "font-weight": 600,
+                            "font-style": "normal",
+                            "src": [
+                                {
+                                    "url": "faso/polices/work-sans-600.woff2",
+                                    "format": "woff2"
+                                }
+                            ]
+                        }
+                    ],
+                    "general": "\"Work Sans\", \"Segoe UI\", system-ui, sans-serif"
+                },
+                "colors": {
+                    "accent-color": "#5078e1",
+                    "primary-color": "#5078e1",
+                    "warning-color": "#e5484d",
+                    "sidebar-color": "#ffffff",
+                    "roomlist-background-color": "#ffffff",
+                    "roomlist-text-color": "#1f2430",
+                    "roomlist-text-secondary-color": "#7a8194",
+                    "roomlist-highlights-color": "#e6edf4",
+                    "roomlist-separator-color": "#e4e8f0",
+                    "timeline-background-color": "#dee9f5",
+                    "timeline-text-color": "#1f2430",
+                    "timeline-text-secondary-color": "#7a8194",
+                    "timeline-highlights-color": "#d3e0f0",
+                    "username-colors": [
+                        "#5078e1",
+                        "#d9485f",
+                        "#2f9e6e",
+                        "#c27c0e",
+                        "#7c5cd6",
+                        "#1f8fb3",
+                        "#c2581f",
+                        "#5a6b8c"
+                    ],
+                    "avatar-background-colors": [
+                        "#5078e1",
+                        "#d9485f",
+                        "#2f9e6e",
+                        "#c27c0e",
+                        "#7c5cd6",
+                        "#1f8fb3",
+                        "#c2581f",
+                        "#5a6b8c"
+                    ]
+                },
+                "compound": {
+                    "--cpd-color-text-action-accent": "#5078e1",
+                    "--cpd-color-icon-accent-tertiary": "#5078e1",
+                    "--cpd-color-icon-accent-primary": "#5078e1",
+                    "--cpd-color-bg-accent-rest": "#5078e1",
+                    "--cpd-color-bg-accent-hovered": "#3f66cc",
+                    "--cpd-color-bg-accent-pressed": "#3557b3",
+                    "--cpd-color-bg-action-primary-rest": "#5078e1",
+                    "--cpd-color-bg-action-primary-hovered": "#3f66cc",
+                    "--cpd-color-bg-action-primary-pressed": "#3557b3",
+                    "--cpd-color-border-focused": "#5078e1",
+                    "--cpd-color-text-link-external": "#3f66cc",
+                    "--cpd-color-bg-subtle-secondary": "#ecf1f6",
+                    "--cpd-color-bg-subtle-primary": "#e1e7f0",
+                    "--cpd-color-bg-canvas-default": "#ffffff",
+                    "--cpd-color-bg-critical-primary": "#e5484d",
+                    "--cpd-color-text-primary": "#1f2430",
+                    "--cpd-color-text-secondary": "#7a8194",
+                    "--cpd-color-border-interactive-secondary": "#d6dce6",
+                    "--cpd-color-border-interactive-primary": "#b9c2d3"
+                }
+            }
+        ],
+        "layout": "bubble",
+        "RoomList.showMessagePreview": true,
+        "Spaces.enabledMetaSpaces": {
+            "home-space": true
+        },
+        "Spaces.allRoomsInHome": true
+    },
+    "features": {
+        "feature_wysiwyg_composer": false
+    },
+    "sso_redirect_options": {
+        "on_welcome_page": true
+    }
+}

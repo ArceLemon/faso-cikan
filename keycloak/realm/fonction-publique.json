@@ -1,0 +1,499 @@
+{
+  "realm": "fonction-publique",
+  "displayName": "Faso Cikan",
+  "enabled": true,
+  "loginTheme": "faso",
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "fr"
+  ],
+  "defaultLocale": "fr",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "loginWithEmailAllowed": false,
+  "duplicateEmailsAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "ssoSessionIdleTimeout": 28800,
+  "ssoSessionMaxLifespan": 36000,
+  "accessTokenLifespan": 300,
+  "passwordPolicy": "length(12) and notUsername and passwordHistory(3)",
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "otpPolicyLookAheadWindow": 1,
+  "otpPolicyCodeReusable": false,
+  "browserFlow": "navigateur-2fa",
+  "roles": {
+    "realm": [
+      {
+        "name": "agent",
+        "description": "Agent de l'administration autorisé à utiliser la messagerie"
+      },
+      {
+        "name": "autorite-revocation",
+        "description": "Peut enrôler, révoquer et réintégrer des agents"
+      }
+    ]
+  },
+  "authenticationFlows": [
+    {
+      "alias": "navigateur-2fa",
+      "description": "Matricule, mot de passe et code à usage unique obligatoires",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "navigateur-2fa-formulaires",
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "navigateur-2fa-formulaires",
+      "description": "Mot de passe puis code à usage unique",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "synapse",
+      "name": "Faso Cikan",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${SYNAPSE_OIDC_SECRET}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": false,
+      "redirectUris": [
+        "https://matrix.${FASO_DOMAINE}/_synapse/client/oidc/callback"
+      ],
+      "webOrigins": [],
+      "attributes": {
+        "backchannel.logout.url": "http://synapse:8008/_synapse/client/oidc/backchannel_logout",
+        "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "https://${FASO_DOMAINE}/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "faso_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "faso_roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "faso-console",
+      "name": "Console d'administration Faso Cikan",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${CONSOLE_OIDC_SECRET}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "frontchannelLogout": false,
+      "redirectUris": [
+        "https://console.${FASO_DOMAINE}/rappel"
+      ],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://console.${FASO_DOMAINE}/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "faso_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "faso_roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "247851k",
+      "enabled": true,
+      "firstName": "Aminata",
+      "lastName": "OUÉDRAOGO",
+      "attributes": {
+        "ministere": [
+          "Ministère de la Fonction publique"
+        ],
+        "fonction": [
+          "Directrice des ressources humaines"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"9PZExdcryNDtmI93vX3t\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent",
+        "autorite-revocation"
+      ]
+    },
+    {
+      "username": "318264b",
+      "enabled": true,
+      "firstName": "Issouf",
+      "lastName": "SAWADOGO",
+      "attributes": {
+        "ministere": [
+          "Ministère de l'Économie et des Finances"
+        ],
+        "fonction": [
+          "Chef de service du budget"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"QVdAeJnV0SzJgzNJubVb\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "402917m",
+      "enabled": true,
+      "firstName": "Mariam",
+      "lastName": "KABORÉ",
+      "attributes": {
+        "ministere": [
+          "Ministère de la Santé"
+        ],
+        "fonction": [
+          "Secrétaire générale"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"2LjuZTRdN4XPbocGe665\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "155380t",
+      "enabled": true,
+      "firstName": "Boukary",
+      "lastName": "ZONGO",
+      "attributes": {
+        "ministere": [
+          "Ministère de l'Administration territoriale"
+        ],
+        "fonction": [
+          "Préfet"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"HjSHEK86s1wz9dh2kQYZ\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "286045a",
+      "enabled": true,
+      "firstName": "Awa",
+      "lastName": "TRAORÉ",
+      "attributes": {
+        "ministere": [
+          "Direction générale du Trésor"
+        ],
+        "fonction": [
+          "Cheffe de division"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"8b8UdqQB5QcASnq67nby\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "511734s",
+      "enabled": true,
+      "firstName": "Salif",
+      "lastName": "COMPAORÉ",
+      "attributes": {
+        "ministere": [
+          "Ministère de l'Éducation nationale"
+        ],
+        "fonction": [
+          "Directeur de cabinet"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"Xrqjvn3iyHCYt7XNPL3Y\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "900001a",
+      "enabled": true,
+      "firstName": "Agent",
+      "lastName": "RECETTE-A",
+      "attributes": {
+        "ministere": [
+          "Recette technique"
+        ],
+        "fonction": [
+          "Compte de test"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"JSOqWjNYqYVq6QV4lyRT\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "900002b",
+      "enabled": true,
+      "firstName": "Agent",
+      "lastName": "RECETTE-B",
+      "attributes": {
+        "ministere": [
+          "Recette technique"
+        ],
+        "fonction": [
+          "Compte de test"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"7J1PnW8eu5vEQ6SQaFMf\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "900003c",
+      "enabled": true,
+      "firstName": "Agent",
+      "lastName": "RECETTE-C",
+      "attributes": {
+        "ministere": [
+          "Recette technique"
+        ],
+        "fonction": [
+          "Compte de test"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"xWEjMkH31VeHBT39kG4B\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": [
+        "agent"
+      ]
+    },
+    {
+      "username": "900004d",
+      "enabled": true,
+      "firstName": "Agent",
+      "lastName": "SANS-ROLE",
+      "attributes": {
+        "ministere": [
+          "Recette technique"
+        ],
+        "fonction": [
+          "Compte sans rôle agent"
+        ]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Cikan-Demo-2026",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "userLabel": "Application d'authentification",
+          "secretData": "{\"value\": \"hW1sQlE4Rqr7sMGXO93T\"}",
+          "credentialData": "{\"subType\": \"totp\", \"digits\": 6, \"counter\": 0, \"period\": 30, \"algorithm\": \"HmacSHA1\"}"
+        }
+      ],
+      "realmRoles": []
+    },
+    {
+      "username": "service-account-faso-console",
+      "enabled": true,
+      "serviceAccountClientId": "faso-console",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users",
+          "query-users",
+          "query-groups",
+          "view-realm"
+        ]
+      }
+    }
+  ],
+  "components": {
+    "org.keycloak.userprofile.UserProfileProvider": [
+      {
+        "providerId": "declarative-user-profile",
+        "subComponents": {},
+        "config": {
+          "kc.user.profile.config": [
+            "{\"attributes\": [{\"name\": \"username\", \"displayName\": \"Matricule\", \"validations\": {\"length\": {\"min\": 3, \"max\": 32}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"email\", \"displayName\": \"Courriel\", \"validations\": {\"email\": {}, \"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"firstName\", \"displayName\": \"Prénom\", \"validations\": {\"length\": {\"max\": 255}}, \"required\": {\"roles\": [\"admin\"]}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"lastName\", \"displayName\": \"Nom\", \"validations\": {\"length\": {\"max\": 255}}, \"required\": {\"roles\": [\"admin\"]}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"ministere\", \"displayName\": \"Ministère\", \"validations\": {\"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}, {\"name\": \"fonction\", \"displayName\": \"Fonction\", \"validations\": {\"length\": {\"max\": 255}}, \"permissions\": {\"view\": [\"admin\", \"user\"], \"edit\": [\"admin\"]}, \"multivalued\": false}], \"groups\": []}"
+          ]
+        }
+      }
+    ]
+  }
+}

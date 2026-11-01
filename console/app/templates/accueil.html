@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titre %}Connexion{% endblock %}
+{% block contenu %}
+<main class="porte">
+  <div class="porte__carte">
+    <p class="surtitre">Accès restreint</p>
+    <h1>Gestion des accès à la messagerie</h1>
+    <p>
+      Cette console permet d'enrôler un agent, de révoquer l'accès d'un agent muté ou radié
+      et de consulter le journal des opérations. Elle est réservée aux agents titulaires
+      du rôle d'autorité de révocation.
+    </p>
+    <a class="bouton bouton--principal" href="/connexion">Se connecter avec mon matricule</a>
+  </div>
+</main>
+{% endblock %}

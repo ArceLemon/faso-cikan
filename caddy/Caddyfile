@@ -1,0 +1,61 @@
+# Point d'entrée unique. En local, Caddy émet ses propres certificats
+# (autorité interne, à importer une fois avec ./faso certificat).
+# En production, remplacer FASO_DOMAINE par le vrai domaine suffit à obtenir
+# des certificats publics.
+
+{
+	admin off
+}
+
+(entetes) {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "geolocation=(), camera=(), microphone=()"
+		-Server
+	}
+}
+
+# Page d'accueil à la racine, messagerie (Element) sous /app
+{$FASO_DOMAINE} {
+	import entetes
+	header X-Frame-Options "SAMEORIGIN"
+	redir /app /app/
+	handle_path /app/* {
+		reverse_proxy element:80
+	}
+	handle {
+		root * /srv/accueil
+		file_server
+	}
+}
+
+# Serveur Matrix. L'API d'administration (/_synapse/admin) n'est pas exposée :
+# elle n'est joignable que depuis le réseau interne, par la console.
+matrix.{$FASO_DOMAINE} {
+	import entetes
+	@matrix path /_matrix/* /_synapse/client/*
+	handle @matrix {
+		reverse_proxy synapse:8008
+	}
+	handle /_matrix/federation/* {
+		respond 404
+	}
+	handle {
+		respond 404
+	}
+}
+
+# Keycloak : connexion des agents
+auth.{$FASO_DOMAINE} {
+	import entetes
+	reverse_proxy keycloak:8080
+}
+
+# Console de l'autorité administrative
+console.{$FASO_DOMAINE} {
+	import entetes
+	header X-Frame-Options "DENY"
+	reverse_proxy console:8000
+}

@@ -1,0 +1,23 @@
+diff --git a/src/rust-crypto/RoomEncryptor.ts b/src/rust-crypto/RoomEncryptor.ts
+index aa19be8..054170d 100644
+--- a/src/rust-crypto/RoomEncryptor.ts
++++ b/src/rust-crypto/RoomEncryptor.ts
+@@ -332,9 +332,17 @@ export class RoomEncryptor {
+             encryptedContent = await this.olmMachine.encryptRoomEvent(room, type, content);
+         }
+ 
++        const enveloppe = JSON.parse(encryptedContent);
++        // Faso Cikan : le serveur doit connaître le niveau et le délai d'expiration
++        // d'un message classifié pour l'effacer à l'échéance, sans lire son contenu.
++        const etiquette = event.getContent()["bf.faso.classification"];
++        if (etiquette) {
++            enveloppe["bf.faso.classification"] = etiquette;
++        }
++
+         event.makeEncrypted(
+             EventType.RoomMessageEncrypted,
+-            JSON.parse(encryptedContent),
++            enveloppe,
+             this.olmMachine.identityKeys.curve25519.toBase64(),
+             this.olmMachine.identityKeys.ed25519.toBase64(),
+         );

@@ -1,0 +1,164 @@
+#!/usr/bin/env bash
+# Pilotage de Faso Cikan. Lancer ./faso sans argument pour l'aide.
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+compose() { docker compose "$@"; }
+
+aide() {
+    cat <<'TXT'
+Faso Cikan, messagerie souveraine de l'administration
+
+  ./faso init                  génère le fichier .env (secrets aléatoires)
+  ./faso demarrer              construit et lance tous les services
+  ./faso arreter               arrête les services (les données sont conservées)
+  ./faso etat                  état des services
+  ./faso journaux [service]    suit les journaux
+
+  ./faso agents                liste les agents enrôlés
+  ./faso revoquer MATRICULE    coupe l'accès d'un agent sur tous ses appareils
+  ./faso reintegrer MATRICULE  rétablit l'accès d'un agent
+
+  ./faso code MATRICULE        code à usage unique d'un compte de démonstration
+  ./faso certificat            exporte l'autorité de certification locale
+  ./faso tests                 lance les tests automatisés de bout en bout
+  ./faso tests-navigateur      joue la démonstration dans un vrai navigateur
+  ./faso reinitialiser         supprime toutes les données (irréversible)
+TXT
+}
+
+secret() { head -c 48 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c "${1:-40}"; }
+
+init() {
+    if [[ -f .env ]]; then
+        echo ".env existe déjà, rien à faire."
+        return
+    fi
+    cat > .env <<ENV
+# Généré par ./faso init le $(date -u +%Y-%m-%dT%H:%M:%SZ). Ne pas versionner.
+
+# Domaine d'accès. En local, *.localhost pointe vers la machine.
+FASO_DOMAINE=faso.localhost
+# Nom du serveur Matrix, il apparaît dans les identifiants : @247851k:faso.gov.bf
+FASO_SERVER_NAME=faso.gov.bf
+
+POSTGRES_PASSWORD=$(secret)
+KEYCLOAK_DB_PASSWORD=$(secret)
+KEYCLOAK_ADMIN=admin-faso
+KEYCLOAK_ADMIN_PASSWORD=$(secret 24)
+
+SYNAPSE_OIDC_SECRET=$(secret)
+SYNAPSE_REGISTRATION_SHARED_SECRET=$(secret 64)
+SYNAPSE_MACAROON_SECRET=$(secret 64)
+SYNAPSE_FORM_SECRET=$(secret 64)
+
+CONSOLE_OIDC_SECRET=$(secret)
+CONSOLE_SESSION_SECRET=$(secret 64)
+CONSOLE_API_JETON=$(secret 48)
+ENV
+    chmod 600 .env
+    echo "Fichier .env créé."
+}
+
+attendre() {
+    echo -n "Attente des services "
+    for _ in $(seq 1 90); do
+        local pas_prets
+        pas_prets=$(compose ps --format '{{.Service}} {{.Health}}' | awk '$2 != "" && $2 != "healthy"' | wc -l)
+        if [[ "$pas_prets" -eq 0 ]]; then
+            echo " prêts."
+            return
+        fi
+        echo -n "."
+        sleep 3
+    done
+    echo
+    echo "Certains services ne sont pas prêts, voir ./faso etat" >&2
+    exit 1
+}
+
+config_element() {
+    # Le client lit sa configuration en statique : on la produit depuis .env.
+    set -a; . ./.env; set +a
+    python3 - <<'PY'
+import os, re
+modele = open("element/config/config.modele.json", encoding="utf-8").read()
+rendu = re.sub(r"\$\{([A-Z_]+)\}", lambda m: os.environ[m.group(1)], modele)
+open("element/config/config.json", "w", encoding="utf-8").write(rendu)
+PY
+}
+
+demarrer() {
+    [[ -f .env ]] || init
+    config_element
+    compose up -d --build
+    attendre
+    local domaine
+    domaine=$(grep '^FASO_DOMAINE=' .env | cut -d= -f2)
+    cat <<TXT
+
+Faso Cikan est en service.
+  Messagerie   https://${domaine}
+  Console      https://console.${domaine}
+  Identité     https://auth.${domaine}/admin  (administration Keycloak)
+
+Première utilisation : ./faso certificat pour faire confiance au certificat local.
+TXT
+}
+
+console() { compose exec -T console python -m app "$@"; }
+
+code() {
+    python3 demo/code.py "${1:?matricule attendu}"
+}
+
+certificat() {
+    mkdir -p certificats
+    compose cp caddy:/data/caddy/pki/authorities/local/root.crt certificats/faso-ca.crt >/dev/null
+    echo "Certificat exporté : certificats/faso-ca.crt"
+    if command -v powershell.exe >/dev/null 2>&1; then
+        local chemin
+        chemin=$(wslpath -w "$(pwd)/certificats/faso-ca.crt")
+        echo "Import dans le magasin Windows de l'utilisateur (une fenêtre de confirmation va s'ouvrir)..."
+        powershell.exe -NoProfile -Command \
+            "Import-Certificate -FilePath '$chemin' -CertStoreLocation Cert:\\CurrentUser\\Root | Out-Null" \
+            && echo "Certificat approuvé. Redémarrez le navigateur."
+    else
+        echo "Importez ce fichier comme autorité de confiance dans votre navigateur."
+    fi
+}
+
+tests() {
+    compose --profile tests build tests >/dev/null
+    compose --profile tests run --rm tests "$@"
+}
+
+tests_navigateur() {
+    mkdir -p tests/navigateur/captures
+    compose --profile tests build navigateur >/dev/null
+    compose --profile tests run --rm navigateur
+}
+
+reinitialiser() {
+    read -r -p "Toutes les conversations, comptes et journaux seront supprimés. Taper SUPPRIMER pour confirmer : " rep
+    [[ "$rep" == "SUPPRIMER" ]] || { echo "Annulé."; return; }
+    compose --profile tests down -v
+}
+
+case "${1:-}" in
+    init) init ;;
+    demarrer) demarrer ;;
+    arreter) compose stop ;;
+    etat) compose ps ;;
+    journaux) shift; compose logs -f --tail 100 "$@" ;;
+    agents) console agents ;;
+    revoquer) console revoquer "${2:?matricule attendu}" ;;
+    reintegrer) console reintegrer "${2:?matricule attendu}" ;;
+    code) code "${2:-}" ;;
+    certificat) certificat ;;
+    tests) shift; tests "$@" ;;
+    tests-navigateur) tests_navigateur ;;
+    reinitialiser) reinitialiser ;;
+    *) aide ;;
+esac

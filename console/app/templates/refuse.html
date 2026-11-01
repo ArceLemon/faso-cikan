@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titre %}Accès refusé{% endblock %}
+{% block contenu %}
+<main class="porte">
+  <div class="porte__carte">
+    <p class="surtitre surtitre--alerte">Accès refusé</p>
+    <h1>Votre compte n'a pas le rôle requis</h1>
+    <p>
+      Le matricule {{ utilisateur.matricule }} est bien authentifié, mais il ne dispose pas
+      du rôle « autorité de révocation ». Si vous pensez qu'il s'agit d'une erreur,
+      adressez-vous à la direction des ressources humaines de votre ministère.
+    </p>
+  </div>
+</main>
+{% endblock %}
